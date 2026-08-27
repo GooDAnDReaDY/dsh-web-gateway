@@ -31,7 +31,7 @@ Add to `$DSH_HOME/.credentials.yaml` (or Settings → Credentials) or the `dsh-w
 ## Install
 
 ```bash
-dsh plugin --profile web add file:/home/vadim/deepseekharness/dsh-web-gateway
+dsh plugin --profile web add @goodandready-private/dsh-web-gateway
 # verify + restart: see dsh-plugin-authoring skill (node --check, dump-config, restart dsh-web, NRestarts=0)
 ```
 
