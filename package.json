@@ -1,6 +1,6 @@
 {
-  "name": "dsh-web-gateway",
-  "version": "0.1.1",
+  "name": "@goodandready-private/dsh-web-gateway",
+  "version": "0.1.2",
   "description": "Web search & extraction gateway for DeepSeek Harness: web_gateway_search / web_gateway_extract tools with a fallback chain (tavily → firecrawl → exa → local searxng) and a crawl4ai-ready extract path.",
   "type": "module",
   "main": "./lib/index.js",
@@ -12,7 +12,8 @@
   "files": [
     "lib/",
     "cordis.patch.yml",
-    "README.md"
+    "README.md",
+    "test"
   ],
   "license": "MIT",
   "keywords": [
@@ -29,6 +30,9 @@
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "dsh": {
     "bundle": {

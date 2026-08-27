@@ -4,4 +4,4 @@
 # $DSH_HOME/settings.yaml under `dsh-web-gateway:`.
 - insert:
     - id: dsh-web-gateway
-      name: dsh-web-gateway
+      name: '@goodandready-private/dsh-web-gateway'
