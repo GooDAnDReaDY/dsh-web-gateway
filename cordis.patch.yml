@@ -1,0 +1,4 @@
+# dsh-web-gateway bundle layer
+- insert:
+    - id: dsh-web-gateway
+      name: '@goodandready/dsh-web-gateway'

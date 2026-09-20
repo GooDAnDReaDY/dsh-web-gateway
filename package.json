@@ -1,0 +1,71 @@
+{
+  "name": "@goodandready/dsh-web-gateway",
+  "version": "0.1.2",
+  "description": "Resilient web search and page extract tools for DeepSeek Harness with a Tavily \u2192 Firecrawl \u2192 Exa \u2192 SearXNG fallback chain and SSRF-safe extract.",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "lib/",
+    "cordis.patch.yml",
+    "README.md",
+    "README.ru.md",
+    "README.zh.md",
+    "LICENSE",
+    "media/"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "web-search",
+    "tavily",
+    "firecrawl",
+    "exa",
+    "searxng",
+    "crawl4ai",
+    "web-extract"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GooDAnDReaDY/dsh-web-gateway.git"
+  },
+  "homepage": "https://github.com/GooDAnDReaDY/dsh-web-gateway",
+  "bugs": {
+    "url": "https://github.com/GooDAnDReaDY/dsh-web-gateway/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/providers.js && node --check lib/url-policy.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-credentials": "^0.1.0-rc.6",
+    "@deepseek-ai/schemastery": "^3.18.1",
+    "@deepseek-ai/dsh-host-webserver": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-settings": "^0.1.0-rc.6"
+  }
+}
