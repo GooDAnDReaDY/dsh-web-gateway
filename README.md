@@ -1,5 +1,10 @@
 # @goodandready/dsh-web-gateway
 
+<p align="center">
+  <a href="https://goodandready.app/"><img src="https://img.shields.io/badge/🌐_DSH_Hub-goodandready.app-ff4500.svg?style=for-the-badge&labelColor=1a1a2e" alt="GoodAndReady Showcase"></a>
+</p>
+
+
 Resilient **web search** and **page extract** tools for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
 
 When the built-in `web_search` / `web_fetch` tools hit rate limits, captchas, or empty results, this plugin gives the model a separate fallback chain with different tool names (no registration collisions).
@@ -60,6 +65,12 @@ npm run check
 ```
 
 Tests run offline with mocked `fetch` (no live network).
+
+## Visual verification
+
+Plugins settings card for Web Gateway — Dark and Light themes side by side:
+
+![dsh-web-gateway v0.1.2 visual verification](media/visual-verification.png)
 
 ## License
 
