@@ -1,42 +1,66 @@
-# dsh-web-gateway
+# @goodandready/dsh-web-gateway
 
-Web search & extraction tools for DeepSeek Harness with a resilient fallback chain (Hermes-style).
+Resilient **web search** and **page extract** tools for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
+
+When the built-in `web_search` / `web_fetch` tools hit rate limits, captchas, or empty results, this plugin gives the model a separate fallback chain with different tool names (no registration collisions).
 
 ## Tools
 
-- **`web_gateway_search(query, limit?, search_depth?)`** — search the web. Chain: `tavily → firecrawl → exa → local searxng`. A provider is skipped on error / empty result / 429 / 5xx. Results are cached in memory (TTL, default 10 min). Prefer over the built-in `web_search` when it hits rate limits / captchas.
-- **`web_gateway_extract(url)`** — fetch a URL and return readable markdown. Chain: `firecrawl scrape → tavily extract → crawl4ai (optional)`. Prefer over the built-in `web_extract` when it fails.
-
-> Tool names deliberately differ from the built-in `web_search` / `web_extract` (dsh-tool-web) to avoid duplicate-registration collisions.
-
-## Keys
-
-Resolved via the DSH credentials service, falling back to the process environment.
-Add to `$DSH_HOME/.credentials.yaml` (or Settings → Credentials) or the `dsh-web` service env:
-
-| Ref | Provider |
+| Tool | Purpose |
 |---|---|
-| `TAVILY_API_KEY` | tavily (search + extract) |
-| `FIRECRAWL_API_KEY` | firecrawl (search + scrape) |
-| `EXA_API_KEY` | exa (search) |
-| `CRAWL4AI_TOKEN` | crawl4ai (extract, only if `crawl4aiUrl` is set) |
+| `web_gateway_search` | Search the web. Chain: **Tavily → Firecrawl → Exa → local SearXNG** |
+| `web_gateway_extract` | Fetch a URL as markdown. Chain: **Firecrawl scrape → Tavily extract → optional Crawl4AI** |
 
-## Config (override in `$DSH_HOME/settings.yaml` under `dsh-web-gateway:` or the profile's `cordis.patch.yml`)
+A provider is skipped on missing key, empty result, HTTP 429/5xx, or network error. Results are cached in memory (configurable TTL).
 
-- `defaultLimit` (5), `maxLimit` (20), `timeoutMs` (30000), `cacheTtlMs` (600000)
-- `searxngUrl` — optional local SearXNG base URL, e.g. `http://127.0.0.1:8888` (empty = disabled)
-- `crawl4aiUrl` — optional crawl4ai base URL, e.g. `http://127.0.0.1:11235` (empty = disabled)
-- per-provider env refs: `tavilyApiKeyEnv`, `firecrawlApiKeyEnv`, `exaApiKeyEnv`, `crawl4aiTokenEnv`
+Extract URLs are validated: **http/https only**, no embedded credentials, and hostnames must resolve to **public** IPs (loopback / RFC1918 / link-local / metadata blocked). Set `allowInternalUrls` only if you intentionally need internal targets.
 
 ## Install
 
 ```bash
-dsh plugin --profile web add @goodandready-private/dsh-web-gateway
-# verify + restart: see dsh-plugin-authoring skill (node --check, dump-config, restart dsh-web, NRestarts=0)
+dsh plugin --profile web add @goodandready/dsh-web-gateway
 ```
 
-## Notes
+Restart the web profile after install.
 
-- Output is text-only (no image blocks) — safe for text-only models.
-- SearXNG fallback only works if the instance is reachable from the host; by default it is disabled until `searxngUrl` is set.
-- crawl4ai requires its API token and is disabled until `crawl4aiUrl` is set.
+## Credentials
+
+Add keys under **Settings → Credentials** (or `$DSH_HOME/.credentials.yaml`). The settings card stores only **credential names**, never secret values:
+
+| Default name | Used by |
+|---|---|
+| `TAVILY_API_KEY` | search + extract |
+| `FIRECRAWL_API_KEY` | search + scrape |
+| `EXA_API_KEY` | search |
+| `CRAWL4AI_TOKEN` | extract (only if `crawl4aiUrl` is set) |
+
+## Settings
+
+Configure in **Settings → Plugins → Web Gateway**:
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `defaultLimit` | `5` | Default search result count |
+| `maxLimit` | `20` | Hard search cap |
+| `timeoutMs` | `30000` | Per-provider timeout |
+| `cacheTtlMs` | `600000` | In-memory cache TTL (`0` disables) |
+| `searxngUrl` | empty | Local SearXNG base URL; empty disables |
+| `crawl4aiUrl` | empty | Crawl4AI base URL; empty disables |
+| `allowInternalUrls` | `false` | Allow private/loopback extract targets |
+
+## How it relates to core DSH web tools
+
+DeepSeek Harness already ships `web_search` and `web_fetch` via `@deepseek-ai/dsh-tool-web`. This plugin does **not** replace them. It registers `web_gateway_*` tools so the model can fall back when the built-in path fails.
+
+## Development
+
+```bash
+npm test
+npm run check
+```
+
+Tests run offline with mocked `fetch` (no live network).
+
+## License
+
+MIT © [GooDAnDReaDY](https://github.com/GooDAnDReaDY)

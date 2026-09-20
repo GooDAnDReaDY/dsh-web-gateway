@@ -1,7 +1,4 @@
-# dsh-web-gateway bundle layer: applied automatically when the package is
-# installed as a profile bundle (package.json declares dsh.bundle.patch).
-# Override any field in the profile's own cordis.patch.yml or in
-# $DSH_HOME/settings.yaml under `dsh-web-gateway:`.
+# dsh-web-gateway bundle layer
 - insert:
     - id: dsh-web-gateway
-      name: '@goodandready-private/dsh-web-gateway'
+      name: '@goodandready/dsh-web-gateway'
