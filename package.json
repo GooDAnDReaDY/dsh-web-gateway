@@ -1,11 +1,12 @@
 {
-  "name": "@goodandready-private/dsh-web-gateway",
+  "name": "@goodandready/dsh-web-gateway",
   "version": "0.1.2",
-  "description": "Web search & extraction gateway for DeepSeek Harness: web_gateway_search / web_gateway_extract tools with a fallback chain (tavily → firecrawl → exa → local searxng) and a crawl4ai-ready extract path.",
+  "description": "Resilient web search and page extract tools for DeepSeek Harness with a Tavily → Firecrawl → Exa → SearXNG fallback chain and SSRF-safe extract.",
   "type": "module",
   "main": "./lib/index.js",
   "exports": {
     ".": "./lib/index.js",
+    "./client": "./lib/client.js",
     "./package.json": "./package.json",
     "./cordis.patch.yml": "./cordis.patch.yml"
   },
@@ -13,7 +14,9 @@
     "lib/",
     "cordis.patch.yml",
     "README.md",
-    "test"
+    "README.ru.md",
+    "README.zh.md",
+    "LICENSE"
   ],
   "license": "MIT",
   "keywords": [
@@ -28,15 +31,28 @@
     "crawl4ai",
     "web-extract"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GooDAnDReaDY/dsh-web-gateway.git"
+  },
+  "homepage": "https://github.com/GooDAnDReaDY/dsh-web-gateway",
+  "bugs": {
+    "url": "https://github.com/GooDAnDReaDY/dsh-web-gateway/issues"
+  },
   "engines": {
     "node": ">=20"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/providers.js && node --check lib/url-policy.js"
   },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
     }
   },
   "peerDependencies": {
