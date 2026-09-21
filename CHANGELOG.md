@@ -7,6 +7,11 @@
 - Configurable `searchProviderOrder` / `extractProviderOrder`
 - Settings card health check for credential presence and local endpoint ping
 
+### Phase B (query quality & cost)
+- Search domain include/exclude + freshness (settings + tool params)
+- Disk-backed profile cache (layered with memory)
+- Per-provider daily caps (UTC) with card usage
+
 ## 0.1.2
 
 First public release of `@goodandready/dsh-web-gateway`.
