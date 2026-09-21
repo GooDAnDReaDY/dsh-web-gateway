@@ -1,18 +1,20 @@
 # Changelog
 
-## Unreleased
+## 0.1.3
 
-### Phase A (transparency & control)
+Public feature release after phases A+B+C.
+
+### Transparency & control
 - Tool responses include `provider`, `skipped[]`, and `cached`
 - Configurable `searchProviderOrder` / `extractProviderOrder`
-- Settings card health check for credential presence and local endpoint ping
+- Settings card health for credential presence and local endpoints
 
-### Phase B (query quality & cost)
+### Query quality & cost
 - Search domain include/exclude + freshness (settings + tool params)
 - Disk-backed profile cache (layered with memory)
 - Per-provider daily caps (UTC) with card usage
 
-### Phase C (agent power)
+### Agent power
 - Tool `web_gateway_research` (search → top-N extract → brief)
 - Keyless extract fallbacks: Jina Reader + HTML readability
 

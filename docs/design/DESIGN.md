@@ -38,7 +38,7 @@
 - 2026-09-20 — SSRF-safe extract by default; reason: Gitea #1; revisit only with explicit allowInternalUrls.
 
 ## Roadmap (approved 2026-09-21)
-- Phase A (#7–#9): skip reporting, provider order, health card — in progress.
+- Phase A (#7–#9): skip reporting, provider order, health card — shipped in 0.1.3.
 - Phase B (#10–#12): domain filters/freshness, disk cache, daily caps.
 - Phase C (#13–#14): `web_gateway_research`, keyless extract fallback.
 - Packaging: three release blocks A→B→C (not one monolith).
