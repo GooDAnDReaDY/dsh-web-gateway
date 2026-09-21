@@ -81,6 +81,10 @@ Configure in **Settings → Plugins → Web Gateway**:
 | `cacheTtlMs` | `600000` | In-memory cache TTL (`0` disables) |
 | `searxngUrl` | empty | Local SearXNG base URL; empty disables |
 | `crawl4aiUrl` | empty | Crawl4AI base URL; empty disables |
+| `includeDomains` / `excludeDomains` | empty | Search domain allow/deny lists |
+| `freshness` | `any` | `any` / `day` / `week` / `month` |
+| `diskCacheEnabled` | `true` | Persist cache under the DSH profile |
+| `dailyCap*` | `0` | Per-provider daily caps (`0` = unlimited, UTC day) |
 | `searchProviderOrder` | `tavily,firecrawl,exa,searxng` | Comma-separated search provider order |
 | `extractProviderOrder` | `firecrawl,tavily,crawl4ai` | Comma-separated extract provider order |
 | `allowInternalUrls` | `false` | Allow private/loopback extract targets |
