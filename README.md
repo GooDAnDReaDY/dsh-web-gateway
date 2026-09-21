@@ -44,7 +44,8 @@ When the built-in `web_search` / `web_fetch` tools hit rate limits, captchas, or
 | Tool | Purpose |
 |---|---|
 | `web_gateway_search` | Search the web. Chain: **Tavily → Firecrawl → Exa → local SearXNG** |
-| `web_gateway_extract` | Fetch a URL as markdown. Chain: **Firecrawl scrape → Tavily extract → optional Crawl4AI** |
+| `web_gateway_extract` | Fetch a URL as markdown. Chain: **Firecrawl → Tavily → Crawl4AI → Jina → readability** |
+| `web_gateway_research` | Search + extract top sources into a capped multi-source brief |
 
 A provider is skipped on missing key, empty result, HTTP 429/5xx, or network error. Results are cached in memory (configurable TTL). Successful responses include `provider`, `skipped` (providers not used and why), and `cached`.
 

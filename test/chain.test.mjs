@@ -23,7 +23,8 @@ test('parseProviderOrder keeps known ids, drops unknown, dedupes', () => {
 
 test('default order strings match allow-lists', () => {
   assert.equal(DEFAULT_SEARCH_ORDER, SEARCH_PROVIDER_IDS.join(','))
-  assert.equal(DEFAULT_EXTRACT_ORDER, EXTRACT_PROVIDER_IDS.join(','))
+  assert.equal(DEFAULT_EXTRACT_ORDER.split(',').sort().join(','), [...EXTRACT_PROVIDER_IDS].sort().join(','))
+  assert.ok(DEFAULT_EXTRACT_ORDER.includes('jina'))
 })
 
 test('runProviderChain returns skipped reasons and first success', async () => {

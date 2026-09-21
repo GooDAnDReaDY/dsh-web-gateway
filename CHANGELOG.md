@@ -12,6 +12,10 @@
 - Disk-backed profile cache (layered with memory)
 - Per-provider daily caps (UTC) with card usage
 
+### Phase C (agent power)
+- Tool `web_gateway_research` (search → top-N extract → brief)
+- Keyless extract fallbacks: Jina Reader + HTML readability
+
 ## 0.1.2
 
 First public release of `@goodandready/dsh-web-gateway`.
