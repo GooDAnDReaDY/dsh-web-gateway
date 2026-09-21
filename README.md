@@ -46,7 +46,7 @@ When the built-in `web_search` / `web_fetch` tools hit rate limits, captchas, or
 | `web_gateway_search` | Search the web. Chain: **Tavily → Firecrawl → Exa → local SearXNG** |
 | `web_gateway_extract` | Fetch a URL as markdown. Chain: **Firecrawl scrape → Tavily extract → optional Crawl4AI** |
 
-A provider is skipped on missing key, empty result, HTTP 429/5xx, or network error. Results are cached in memory (configurable TTL).
+A provider is skipped on missing key, empty result, HTTP 429/5xx, or network error. Results are cached in memory (configurable TTL). Successful responses include `provider`, `skipped` (providers not used and why), and `cached`.
 
 Extract URLs are validated: **http/https only**, no embedded credentials, and hostnames must resolve to **public** IPs (loopback / RFC1918 / link-local / metadata blocked). Set `allowInternalUrls` only if you intentionally need internal targets.
 
@@ -81,6 +81,8 @@ Configure in **Settings → Plugins → Web Gateway**:
 | `cacheTtlMs` | `600000` | In-memory cache TTL (`0` disables) |
 | `searxngUrl` | empty | Local SearXNG base URL; empty disables |
 | `crawl4aiUrl` | empty | Crawl4AI base URL; empty disables |
+| `searchProviderOrder` | `tavily,firecrawl,exa,searxng` | Comma-separated search provider order |
+| `extractProviderOrder` | `firecrawl,tavily,crawl4ai` | Comma-separated extract provider order |
 | `allowInternalUrls` | `false` | Allow private/loopback extract targets |
 
 ## How it relates to core DSH web tools
