@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Phase A (transparency & control)
+- Tool responses include `provider`, `skipped[]`, and `cached`
+- Configurable `searchProviderOrder` / `extractProviderOrder`
+- Settings card health check for credential presence and local endpoint ping
+
 ## 0.1.2
 
 First public release of `@goodandready/dsh-web-gateway`.

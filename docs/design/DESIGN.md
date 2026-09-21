@@ -36,3 +36,14 @@
 ## Locked Design Decisions
 - 2026-09-20 — Public package `@goodandready/dsh-web-gateway`; reason: public plugin policy; revisit only for identity migration task.
 - 2026-09-20 — SSRF-safe extract by default; reason: Gitea #1; revisit only with explicit allowInternalUrls.
+
+## Roadmap (approved 2026-09-21)
+- Phase A (#7–#9): skip reporting, provider order, health card — in progress.
+- Phase B (#10–#12): domain filters/freshness, disk cache, daily caps.
+- Phase C (#13–#14): `web_gateway_research`, keyless extract fallback.
+- Packaging: three release blocks A→B→C (not one monolith).
+
+## Locked Design Decisions
+- 2026-09-21 — Tool responses expose `skipped` + `cached`; reason: operator/agent transparency; revisit only if output size becomes a problem.
+- 2026-09-21 — Provider order via comma-separated settings strings; reason: simple native card fields; revisit if DSH gains ordered-list settings widgets.
+- 2026-09-21 — Health shows credential presence only (never values); reason: secret hygiene; revisit never for raw keys.
