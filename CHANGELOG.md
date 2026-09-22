@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+### Fixed
+- The settings card no longer waits for the removed `settingsScope` service. It uses `configForms` on current DeepSeek Harness (#21).
+
 ## 0.1.3
 
 Public feature release after phases A+B+C.
