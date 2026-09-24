@@ -39,11 +39,16 @@
 
 ## Roadmap (approved 2026-09-21)
 - Phase A (#7–#9): skip reporting, provider order, health card — shipped in 0.1.3.
-- Phase B (#10–#12): domain filters/freshness, disk cache, daily caps.
-- Phase C (#13–#14): `web_gateway_research`, keyless extract fallback.
-- Packaging: three release blocks A→B→C (not one monolith).
+- Phase B (#10–#12): domain filters/freshness, disk cache, daily caps — shipped in 0.1.3.
+- Phase C (#13–#14): `web_gateway_research`, keyless extract fallback — shipped in 0.1.3.
+- Phase D (#23–#27): Brave Search, keyless DuckDuckGo, circuit breaker, compact pruning, category search, document extraction — shipped in 0.1.5.
+- Phase E (#28–#32): parallel search strategies (race/aggregate), semantic query caching, vision screenshot support, cost & latency dashboard, egress proxy.
+- Packaging: staged release blocks.
 
 ## Locked Design Decisions
 - 2026-09-21 — Tool responses expose `skipped` + `cached`; reason: operator/agent transparency; revisit only if output size becomes a problem.
 - 2026-09-21 — Provider order via comma-separated settings strings; reason: simple native card fields; revisit if DSH gains ordered-list settings widgets.
 - 2026-09-21 — Health shows credential presence only (never values); reason: secret hygiene; revisit never for raw keys.
+
+- 2026-09-24 — Circuit breaker trips on consecutive 4xx/5xx errors with 5-minute cooldown; reason: eliminate long agent timeouts on broken endpoints.
+- 2026-09-24 — Compact extract enabled by default with code preservation; reason: agent context optimization.

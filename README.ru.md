@@ -43,10 +43,11 @@
 
 | Инструмент | Назначение |
 |---|---|
-| `web_gateway_search` | Поиск. Цепочка: **Tavily → Firecrawl → Exa → локальный SearXNG** |
-| `web_gateway_extract` | Извлечение URL в Markdown. Цепочка: **Firecrawl scrape → Tavily extract → опционально Crawl4AI** |
+| `web_gateway_search` | Поиск. Цепочка: **Tavily → Brave → Firecrawl → Exa → локальный SearXNG → DuckDuckGo** |
+| `web_gateway_extract` | Извлечение URL в Markdown. Цепочка: **Firecrawl → Tavily → Crawl4AI → Jina → readability** |
+| `web_gateway_research` | Поиск + извлечение топ-источников в единый краткий дайджест |
 
-Провайдер пропускается при отсутствии ключа, пустом ответе, HTTP 429/5xx или сетевой ошибке. Результаты кэшируются в памяти (настраиваемый TTL).
+Провайдер пропускается при отсутствии ключа, пустом ответе, HTTP 429/5xx или сетевой ошибке. Встроенный **Circuit Breaker** автоматически временно исключает сбоящие провайдеры на время cooldown. Результаты кэшируются в памяти (настраиваемый TTL).
 
 URL для extract проверяются: только **http/https**, без credentials в ссылке, hostname должен резолвиться в **публичный** IP (loopback / RFC1918 / link-local / metadata по умолчанию запрещены). `allowInternalUrls` включайте только осознанно.
 
