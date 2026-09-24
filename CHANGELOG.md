@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.5
+
+Release 1 (Phase D) — Core search resilience, reliability and token efficiency.
+
+### Added
+- **Brave Search API** provider (`brave`) with `BRAVE_API_KEY` credential support (#23)
+- **DuckDuckGo** keyless search fallback (`duckduckgo`) without requiring API keys (#23)
+- **Circuit Breaker** to temporarily pause providers in cooldown after repeated failures or rate limits (#25)
+- **Token-efficient content pruning** (`compactExtract`) to strip boilerplate cookie notices, navigation lists and social links (#26)
+- **Category-aware search** (`category: general | news | code | academic`) for `web_gateway_search` and `web_gateway_research` (#27)
+- **Structured document handling** in `web_gateway_extract` for `.csv`, `.json`, `.txt`, and PDF document links (#24)
+- Settings card controls for Brave / DuckDuckGo daily caps, circuit breaker threshold, and compact extract (#23, #25, #26)
+
 ## 0.1.4
 
 ### Fixed
