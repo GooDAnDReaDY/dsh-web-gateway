@@ -43,11 +43,11 @@ When the built-in `web_search` / `web_fetch` tools hit rate limits, captchas, or
 
 | Tool | Purpose |
 |---|---|
-| `web_gateway_search` | Search the web. Chain: **Tavily → Firecrawl → Exa → local SearXNG** |
+| `web_gateway_search` | Search the web. Chain: **Tavily → Brave → Firecrawl → Exa → SearXNG → DuckDuckGo** |
 | `web_gateway_extract` | Fetch a URL as markdown. Chain: **Firecrawl → Tavily → Crawl4AI → Jina → readability** |
 | `web_gateway_research` | Search + extract top sources into a capped multi-source brief |
 
-A provider is skipped on missing key, empty result, HTTP 429/5xx, or network error. Results are cached in memory (configurable TTL). Successful responses include `provider`, `skipped` (providers not used and why), and `cached`.
+A provider is skipped on missing key, empty result, HTTP 429/5xx, rate limits or network error. Built-in **Circuit Breaker** temporarily pauses providers suffering consecutive failures to avoid long timeouts. Results are cached in memory (configurable TTL). Successful responses include `provider`, `skipped` (providers not used and why), and `cached`.
 
 Extract URLs are validated: **http/https only**, no embedded credentials, and hostnames must resolve to **public** IPs (loopback / RFC1918 / link-local / metadata blocked). Set `allowInternalUrls` only if you intentionally need internal targets.
 
@@ -68,6 +68,7 @@ Add keys under **Settings → Credentials** (or `$DSH_HOME/.credentials.yaml`). 
 | `TAVILY_API_KEY` | search + extract |
 | `FIRECRAWL_API_KEY` | search + scrape |
 | `EXA_API_KEY` | search |
+| `BRAVE_API_KEY` | search |
 | `CRAWL4AI_TOKEN` | extract (only if `crawl4aiUrl` is set) |
 
 ## Settings

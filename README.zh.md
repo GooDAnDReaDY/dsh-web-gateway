@@ -43,10 +43,11 @@
 
 | 工具 | 作用 |
 |---|---|
-| `web_gateway_search` | 网页搜索。链路：**Tavily → Firecrawl → Exa → 本地 SearXNG** |
-| `web_gateway_extract` | 将 URL 提取为 Markdown。链路：**Firecrawl scrape → Tavily extract → 可选 Crawl4AI** |
+| `web_gateway_search` | 网页搜索。链路：**Tavily → Brave → Firecrawl → Exa → 本地 SearXNG → DuckDuckGo** |
+| `web_gateway_extract` | 将 URL 提取为 Markdown。链路：**Firecrawl → Tavily → Crawl4AI → Jina → readability** |
+| `web_gateway_research` | 搜索并提取多来源网页为精简 Markdown 摘要 |
 
-缺少密钥、空结果、HTTP 429/5xx 或网络错误时会跳过该提供商。结果可按 TTL 缓存在内存中。
+缺少密钥、空结果、HTTP 429/5xx 或网络错误时会跳过该提供商。内置**熔断器 (Circuit Breaker)** 会在多次连续失败后自动暂时隔离该提供商。结果可按 TTL 缓存在内存中。
 
 提取 URL 会校验：仅 **http/https**，禁止 URL 内嵌凭据，主机名必须解析为 **公网** IP（回环 / RFC1918 / 链路本地 / 元数据地址默认拦截）。仅在确实需要时才打开 `allowInternalUrls`。
 
