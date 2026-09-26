@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.6
+
+Security hardening and identity consistency release.
+
+### Security
+- **IPv6 SSRF protection**: fixed `isPublicIpv6` to parse IPv6 addresses into 8 words and validate IPv4-mapped addresses in hex (`::ffff:7f00:1`, `::ffff:a9fe:a9fe`) and dot-decimal forms through `isPublicIpv4`. Unspecified (`::`), multicast (`ff00::/8`), link-local, ULA, and documentation ranges are rejected (#19).
+- **SSRF redirect validation**: `readabilityExtract` now enforces manual redirect handling, validating each intermediate target URL against public IP and scheme policies before following, preventing SSRF redirects to loopback/private hosts (#20).
+
+### Fixed
+- **Host export identity**: aligned `export const name` in `lib/index.js` with `@goodandready/dsh-web-gateway` across package, patch, and browser loader (#34).
+
 ## 0.1.5
 
 Release 1 (Phase D) — Core search resilience, reliability and token efficiency.
