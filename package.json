@@ -1,6 +1,6 @@
 {
   "name": "@goodandready/dsh-web-gateway",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Resilient web search and page extract tools for DeepSeek Harness with Tavily / Brave / Firecrawl / Exa / SearXNG / DuckDuckGo fallback chain, circuit breaker and SSRF-safe extract.",
   "type": "module",
   "main": "./lib/index.js",
