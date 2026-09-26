@@ -23,9 +23,18 @@ test('isPublicIpAddress blocks private and loopback', () => {
   assert.equal(isPublicIpAddress('172.16.5.5'), false)
   assert.equal(isPublicIpAddress('169.254.169.254'), false)
   assert.equal(isPublicIpAddress('::1'), false)
+  assert.equal(isPublicIpAddress('::'), false)
+  assert.equal(isPublicIpAddress('ff02::1'), false)
   assert.equal(isPublicIpAddress('fe80::1'), false)
   assert.equal(isPublicIpAddress('fc00::1'), false)
+  assert.equal(isPublicIpAddress('2001:db8::1'), false)
   assert.equal(isPublicIpAddress('::ffff:127.0.0.1'), false)
+  assert.equal(isPublicIpAddress('::ffff:7f00:1'), false)
+  assert.equal(isPublicIpAddress('::ffff:a9fe:a9fe'), false)
+  assert.equal(isPublicIpAddress('::ffff:8.8.8.8'), true)
+  assert.equal(isPublicIpAddress('::ffff:808:808'), true)
+  assert.equal(isPublicIpAddress('2001:4860:4860::8888'), true)
+  assert.equal(isPublicIpAddress('2606:4700:4700::1111'), true)
 })
 
 test('assertExtractUrlAllowed blocks literal private hosts', async () => {
