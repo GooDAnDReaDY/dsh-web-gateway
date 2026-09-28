@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.7
 
 ### Fixed
 - **Settings card never mounted** (#38): the card registered only on `settings.plugin.item`, retired before DSH 0.1.7-rc.2, so the plugin had no configuration UI on any current release. It now registers on `plugins.item` and `plugins.row.config`.
