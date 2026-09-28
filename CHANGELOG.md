@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- **Settings card never mounted** (#38): the card registered only on `settings.plugin.item`, retired before DSH 0.1.7-rc.2, so the plugin had no configuration UI on any current release. It now registers on `plugins.item` and `plugins.row.config`.
+- **Namespace never served** (#37): `Config` declared no `.volatile()` field, and DSH builds a namespace's settings form from the volatile fields of its profile entry schema — a schema with none yields no form at all. Card-editable fields are now `.volatile()` and unwrapped to plain values on read, leaving every existing use site unchanged.
+- **Settings writes never reached the host** (#37): the host called `settings.register`, which exists in neither 0.1.7-rc.2 nor 0.2.0, so the optional call silently yielded `undefined` and the plugin ran on boot defaults for the process lifetime. The host now re-reads its config on `loader/volatile-update`, which both releases emit.
+- **Card read path** (#37): `ConfigForm` exposes `getSnapshot()` and a no-argument `subscribe()` in both releases; the card used `get()`/`watch()`, which exist in neither, so it always fell through to "unavailable". The per-field `set()` write path was already correct.
+
+### Changed
+- **Peer ranges** (#58): `@deepseek-ai/dsh-tools`, `dsh-credentials`, `dsh-host-webserver` and `dsh-settings` now accept both the 0.1.7-rc.2 and 0.2.0-rc.1 package lines (`^0.1.7-rc.2 || ^0.2.0-rc.1`).
+- **`@deepseek-ai/schemastery` peer** raised to `^3.18.4`, the first line that ships `.volatile()`. 3.18.1–3.18.3 parse `.volatile()` as absent, which would break the form silently.
+
 ## 0.1.6
 
 Security hardening and identity consistency release.
