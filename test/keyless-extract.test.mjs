@@ -71,7 +71,7 @@ test('readabilityExtract blocks redirect to loopback target without fetching it'
   await assert.rejects(
     () => readabilityExtract({}, { readabilityEnabled: true }, 'https://example.com/ssrf-trap', undefined, fetchImpl),
     (err) => {
-      assert.match(err.message, /non-public IP address|invalid URL/i)
+      assert.match(err.message, /non-public IP address|invalid URL|cross-origin redirects are not allowed/i)
       return true
     },
   )

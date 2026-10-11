@@ -70,3 +70,14 @@ test('allowInternal skips public-IP policy', async () => {
   const url = await assertExtractUrlAllowed('http://127.0.0.1/local', { allowInternal: true })
   assert.equal(url.hostname, '127.0.0.1')
 })
+
+test('isPublicIpAddress blocks NAT64 local-use and Teredo', () => {
+  // NAT64 local-use RFC 8215 (64:ff9b:1::/48)
+  assert.equal(isPublicIpAddress('64:ff9b:1::a00:1'), false) // 10.0.0.1
+  assert.equal(isPublicIpAddress('64:ff9b:1::7f00:1'), false) // 127.0.0.1
+  assert.equal(isPublicIpAddress('64:ff9b:1::808:808'), true) // 8.8.8.8
+
+  // Teredo RFC 4380 (2001::/32)
+  assert.equal(isPublicIpAddress('2001::1'), false)
+  assert.equal(isPublicIpAddress('2001:0:1234::1'), false)
+})
