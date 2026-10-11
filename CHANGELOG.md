@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.8
+
+### Security & Hardening
+- **SSRF Policy Hardening** (#44, #49, #53): Connect-time DNS validation and safe dispatcher hook to prevent TOCTOU SSRF rebinding; extended IPv6 SSRF validation to block local-use NAT64 (`64:ff9b:1::/48`, RFC 8215) and Teredo (`2001::/32`, RFC 4380).
+- **Same-Origin Redirect Enforcement** (#42): Enforced `assertSameOriginRedirect` on public readability extracts to prevent cross-origin redirect escapes.
+- **Bounded Response Bodies** (#43): Added streaming length limits (`MAX_BODY_BYTES = 2MB`) to protect against memory exhaustion on large upstream responses.
+- **Endpoint Protection** (#52): Restricted `/api/dsh-web-gateway/health` and GET `/api/dsh-web-gateway/update` endpoints to loopback requests.
+
+### Fixed
+- **Settings Deserialization** (#41, #47): Fixed `readConfig` to properly unwrap boxed `Volatile` values before cloning, preventing silent fallback to schema defaults.
+- **Slot Contract Compliance** (#48): Aligned slot registrations with DSH core contracts (`plugins.row.config` strictly keyed `@goodandready/dsh-web-gateway#dsh-web-gateway`, `plugins.item` registered with `id` and `label`).
+- **Locale Lifecycles** (#50): Wrapped UI locale registrations in `ctx.effect` to prevent duplicate registrations and ensure clean hot-reloads.
+- **Design System Tokens** (#51): Replaced invalid CSS aliases with official DSH theme tokens (`--dsw-alias-state-error-primary`, `--dsw-alias-state-warn-primary`).
+- **Dynamic Tool Timeouts** (#45): Made tool `timeoutMs` dynamic getters so live configuration updates take immediate effect.
+- **Daily Caps Concurrency** (#46): Added in-memory state synchronization for daily-caps counters to avoid race conditions.
+
 ## 0.1.7
 
 ### Fixed
