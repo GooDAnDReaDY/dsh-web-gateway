@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+### Added
+- **Parallel Search Strategies** (#28): Added `searchStrategy` (`fallback` sequential default, `race` fastest-wins with `AbortController` cancellation of slower competitors, and `aggregate` parallel multi-provider query with normalized URL deduplication) plus `parallelMaxConcurrency` configuration and `strategy` tool parameter on `web_gateway_search`.
+- **Normalized Query Keys & Semantic Caching** (#29): Added `normalizeSearchQuery` in `lib/filters.js` to canonicalize search cache keys across casing, punctuation, and word-order permutations while preserving quoted phrases (`"..."`), `-negations`, and `site:` operators.
+- **Visual Page Snapshots** (#30): Added `take_screenshot: boolean` parameter to `web_gateway_extract` supported by Firecrawl and Crawl4AI providers, persisting bounded PNG/JPEG/WebP snapshots under `<profileDir>/data/dsh-web-gateway/screenshots`.
+- **Latency Telemetry & Cost Estimation** (#31): Added rolling latency window (p50/p95 ms) and per-provider USD cost estimation in `lib/telemetry.js`, exposed via `GET /api/dsh-web-gateway/health` (with `POST /api/dsh-web-gateway/health` reset) and displayed in the Web Gateway settings card.
+- **Configurable Outbound Egress Proxy** (#32): Added `egressProxyUrl` setting validated via `parseProxyUrl` and wired into `getSafeDispatcher` for SearXNG, DuckDuckGo, Crawl4AI, and Readability while enforcing pre-proxy SSRF target checks (`assertExtractUrlAllowed`).
+
 ## 0.1.8
 
 ### Security & Hardening
