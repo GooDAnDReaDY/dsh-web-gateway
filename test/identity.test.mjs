@@ -30,3 +30,10 @@ test('README uses public install route', async () => {
   assert.doesNotMatch(readme, /@goodandready-private/)
   assert.doesNotMatch(readme, /add file:/)
 })
+
+test('updater metadata matches package identity and preserves release-age guard', async () => {
+  const updater = await readFile(resolve(root, 'lib/updater.js'), 'utf8')
+  assert.match(updater, /@goodandready\/dsh-web-gateway/)
+  assert.doesNotMatch(updater, /@goodandready\/dsh-usage-guard/)
+  assert.doesNotMatch(updater, /minimumReleaseAge/)
+})
