@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Fixed
+- **Purged Ghost Theme Tokens** (#58): Removed non-existent `state-danger-primary` and `state-warning-primary` from CSS fallback chains in `lib/client.js`, retaining canonical `var(--dsw-alias-state-error-primary, #ef4444)` and `var(--dsw-alias-state-warn-primary, #f59e0b)`. Added regression test.
+- **Updater Identity & Release-Age Guard** (#59): Corrected package identity in `lib/updater.js` header to `@goodandready/dsh-web-gateway` and removed `--config.minimumReleaseAge=0` to restore standard pnpm release-age protection. Added regression test.
+
 ## 0.2.0
 
 ### Added
