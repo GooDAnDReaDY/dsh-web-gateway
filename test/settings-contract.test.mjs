@@ -91,3 +91,11 @@ test('peer ranges accept the 0.1.7 and 0.2.0 DSH package lines', async () => {
     'schemastery 3.18.1 lacks .volatile() and must not be accepted',
   )
 })
+
+test('client styles use canonical theme tokens with no ghost fallbacks', async () => {
+  const client = await readFile(resolve(root, 'lib/client.js'), 'utf8')
+  assert.doesNotMatch(client, /state-danger-primary/)
+  assert.doesNotMatch(client, /state-warning-primary/)
+  assert.match(client, /var\(--dsw-alias-state-error-primary, #ef4444\)/)
+  assert.match(client, /var\(--dsw-alias-state-warn-primary, #f59e0b\)/)
+})
