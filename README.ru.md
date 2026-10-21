@@ -39,6 +39,34 @@
 
 Когда встроенные `web_search` / `web_fetch` упираются в лимиты, капчу или пустой ответ, этот плагин даёт модели отдельную запасную цепочку с другими именами инструментов (без конфликта регистрации).
 
+## Обзор / Проблема
+
+DSH поставляет `web_search` и `web_fetch`, но один upstream может упереться в лимит, капчу или вернуть пустой результат. Плагин добавляет отдельные `web_gateway_*` инструменты: каждый провайдер разворачивается в бесплатные и ключевые попытки, все бесплатные идут раньше ключевых, а каждый пропуск или сбой сообщается с режимом. Плагин не заменяет встроенные инструменты.
+
+## Архитектура
+
+```mermaid
+graph LR
+  A[Вызов инструмента агентом] --> B[web_gateway_search / extract / research]
+  B --> C[Развёртывание попыток: provider + mode]
+  C --> D[Бесплатно: Firecrawl keyless, Keenable keyless, SearXNG, DuckDuckGo, Jina, readability]
+  D --> E[По ключам: Firecrawl, Keenable, Tavily, Brave, Exa, Crawl4AI]
+  E --> F[Guards: лимиты по режиму, circuit breaker, телеметрия]
+  F --> G[Результат, причины пропусков, кэш]
+  B --> H[URL-политика: публичный IP, same-origin redirects, лимит тела]
+```
+
+| Модуль | Ответственность |
+|---|---|
+| `lib/index.js` | Хост-фасад: Config, регистрация инструментов и маршрутов health/update |
+| `lib/attempts.js` | Разворачивает порядок провайдеров в `provider:mode`; free-first |
+| `lib/chain.js` | fallback / race / aggregate; per-attempt timeout и общий дедлайн |
+| `lib/guards.js` | Лимиты по режиму, circuit breaker, телеметрия |
+| `lib/providers.js` | HTTP-вызовы провайдеров, bounded JSON, скриншоты, документы |
+| `lib/url-policy.js` | URL/DNS-политика и connect-time `undici` dispatcher |
+| `lib/updater.js` | Same-origin статус/установка обновления |
+| `lib/client.js` | Карточка настроек, health/updater, en/zh локали и стили |
+
 ## Инструменты
 
 | Инструмент | Назначение |
@@ -46,6 +74,17 @@
 | `web_gateway_search` | Поиск. Бесплатные: **Firecrawl keyless → Keenable keyless → SearXNG → DuckDuckGo**; затем ключи: **Firecrawl → Keenable → Tavily → Brave → Exa** |
 | `web_gateway_extract` | Извлечение URL в Markdown. Бесплатные: **Firecrawl keyless → Jina → readability**; затем ключи: **Firecrawl → Tavily → Crawl4AI** |
 | `web_gateway_research` | Поиск + извлечение топ-источников в единый краткий дайджест |
+
+## HTTP API
+
+Карточка использует два same-origin маршрута. Loopback-запросы разрешены всегда; удалённый браузер — только при `Sec-Fetch-Site: same-origin` или при совпадении `Origin` и `Host`. Так карточка работает через LAN/Tailscale/reverse proxy, но не открывает маршруты для cross-site запросов.
+
+| Маршрут | Методы | Доступ | Назначение |
+|---|---|---|---|
+| `/api/dsh-web-gateway/health` | `GET`, `HEAD` | loopback или same-origin | Credentials, endpoints, caps, breaker, telemetry |
+| `/api/dsh-web-gateway/health` | `POST` | loopback или same-origin | Сброс телеметрии |
+| `/api/dsh-web-gateway/update` | `GET`, `HEAD` | loopback или same-origin | Проверка версии |
+| `/api/dsh-web-gateway/update` | `POST` | loopback или same-origin + `x-dsh-plugin-update: 1` | Установка точной версии |
 
 Провайдер пропускается при отсутствии ключа, пустом ответе, HTTP 429/5xx или сетевой ошибке. Встроенный **Circuit Breaker** автоматически временно исключает сбоящие провайдеры на время cooldown. Результаты кэшируются в памяти (настраиваемый TTL).
 
@@ -59,7 +98,7 @@ Keenable появляется в порядке по умолчанию посл
 
 Внутренние URL при `allowInternalUrls=true` обслуживает только локальный `readability`; облачные провайдеры для них пропускаются.
 
-URL для extract проверяются: только **http/https**, без credentials в ссылке, hostname должен резолвиться в **публичный** IP (loopback / RFC1918 / link-local / metadata по умолчанию запрещены). `allowInternalUrls` включайте только осознанно.
+URL для extract проверяются: только **http/https**, без credentials в ссылке, hostname должен резолвиться в **публичный** IP (loopback / RFC1918 / link-local / metadata по умолчанию запрещены) и повторно проверяется при соединении через `undici` dispatcher. `allowInternalUrls` включайте только осознанно.
 
 ## Установка
 
@@ -74,6 +113,38 @@ dsh plugin --profile web add @goodandready/dsh-web-gateway
 Ключи храните в **Настройки → Credentials** (или `$DSH_HOME/.credentials.yaml`). В карточке плагина — только **имена** credentials, не сами секреты.
 
 `FIRECRAWL_API_KEY` и `KEENABLE_API_KEY` необязательны: keyless-режим работает без них. Значение credential может содержать несколько ключей через запятую.
+
+## Настройки
+
+Настройка в **Settings → Plugins → Web Gateway**:
+
+| Параметр | По умолчанию | Значение |
+|---|---|---|
+| `defaultLimit` | `5` | Результатов поиска по умолчанию |
+| `maxLimit` | `20` | Жёсткий предел поиска |
+| `timeoutMs` | `30000` | Таймаут одной попытки; общий бюджет — `searchDeadlineMs` / `extractDeadlineMs` |
+| `cacheTtlMs` | `600000` | TTL кэша в памяти (`0` отключает) |
+| `searxngUrl` / `crawl4aiUrl` | пусто | Локальные endpoint-ы; пусто отключает |
+| `freshness` | `any` | `any` / `day` / `week` / `month` |
+| `freeTierFirst` | `true` | Все keyless-попытки до любых keyed |
+| `firecrawlKeylessSearch` / `firecrawlKeylessFetch` | `true` | Разрешить keyless Firecrawl |
+| `keenableEnabled` / `keenableApiKeyEnv` | `true` / `KEENABLE_API_KEY` | Keenable и имя credential |
+| `duckduckgoEnabled` | `true` | Keyless DuckDuckGo |
+| `searchDeadlineMs` / `extractDeadlineMs` | `60000` | Общий бюджет одной цепочки |
+| `circuitBreakerCooldownMs` | `300000` | Длительность паузы после срабатывания breaker |
+| `dailyCap*` | `0` | Дневные лимиты по provider+mode (`0` = без лимита) |
+| `dailyCapJina` / `dailyCapReadability` | `0` | Лимиты keyless extract fallback |
+| `searchProviderOrder` | `firecrawl,keenable,searxng,duckduckgo,tavily,brave,exa` | Порядок поиска |
+| `extractProviderOrder` | `firecrawl,tavily,crawl4ai,jina,readability` | Порядок extract |
+| `allowInternalUrls` | `false` | Разрешить внутренние URL (только локальный провайдер) |
+
+## Ограничения
+
+- Локальный `readability` явно отклоняет PDF/DOCX; для документов используйте Jina или Firecrawl.
+- Keyless Firecrawl/Keenable отправляют публичные запросы/URL в облако; отключите, если это неприемлемо.
+- Карточка и маршруты требуют same-origin; reverse proxy должен сохранять `Origin` / `Host` (или `Sec-Fetch-Site`).
+- Скриншоты создаются только при `take_screenshot`, лимит файла — 5 MB.
+- Таймаут провайдера считается failure для circuit breaker; повторные таймауты приостанавливают провайдера.
 
 ## Связь со штатным веб-поиском DSH
 

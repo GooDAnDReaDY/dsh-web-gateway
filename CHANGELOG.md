@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.3
+
+### Fixed
+- **SSRF connect-time DNS pinning** (#65): `undici` is now a direct dependency; `getSafeDispatcher` returns a real Agent/ProxyAgent, and its lookup hook supports promise resolvers. The documented connect-time rebinding protection is now active.
+- **Remote settings card** (#66): health and update routes accept loopback or same-origin (`Sec-Fetch-Site`, or matching `Origin`/`Host`) instead of loopback only; cross-site requests stay blocked.
+- **DOCX handling** (#67): local `readability` rejects DOCX with a clear reason instead of stripping binary; document extraction is delegated to Jina or Firecrawl.
+- **Timeouts and breaker** (#68): `TimeoutError` now records a provider failure; race-loser `AbortError` is still ignored.
+- **Bounded JSON** (#69): Tavily, Brave, SearXNG, Exa, and Crawl4AI JSON reads use the 2 MB bounded reader.
+- **Docs and UI drift** (#70): tool description, card header, README timeout row, DESIGN and index now reflect the free-tier-first chain and the active per-attempt `timeoutMs`.
+- **Settings and health surface** (#71): Jina/readability caps, breaker cooldown, and DuckDuckGo toggle are in the card; Keenable appears in health.
+- **Documentation standard** (#72): README trio gained Overview, Mermaid architecture, module breakdown, HTTP routes, settings and limits; DESIGN gained route/publication policies; `openwiki/` added.
+- **Dead export** (#73): removed the `normalizeError` re-export from `lib/index.js`; large files remain cohesive by decision.
+
 ## 0.2.2
 
 ### Added

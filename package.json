@@ -1,6 +1,6 @@
 {
   "name": "@goodandready/dsh-web-gateway",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Resilient web search and page extract tools for DeepSeek Harness with free-tier-first Firecrawl / Keenable / SearXNG / DuckDuckGo attempts, then Tavily / Brave / Exa keys, circuit breaker and SSRF-safe extract.",
   "type": "module",
   "main": "./lib/index.js",
@@ -64,6 +64,9 @@
         "@deepseek-ai/dsh-client-ui-settings"
       ]
     }
+  },
+  "dependencies": {
+    "undici": "^6.21.0"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
