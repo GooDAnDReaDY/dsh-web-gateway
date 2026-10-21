@@ -43,11 +43,21 @@
 
 | 工具 | 作用 |
 |---|---|
-| `web_gateway_search` | 网页搜索。链路：**Tavily → Brave → Firecrawl → Exa → 本地 SearXNG → DuckDuckGo** |
-| `web_gateway_extract` | 将 URL 提取为 Markdown。链路：**Firecrawl → Tavily → Crawl4AI → Jina → readability** |
+| `web_gateway_search` | 网页搜索。免费通道：**Firecrawl keyless → Keenable keyless → SearXNG → DuckDuckGo**；然后密钥：**Firecrawl → Keenable → Tavily → Brave → Exa** |
+| `web_gateway_extract` | 将 URL 提取为 Markdown。免费通道：**Firecrawl keyless → Jina → readability**；然后密钥：**Firecrawl → Tavily → Crawl4AI** |
 | `web_gateway_research` | 搜索并提取多来源网页为精简 Markdown 摘要 |
 
 缺少密钥、空结果、HTTP 429/5xx 或网络错误时会跳过该提供商。内置**熔断器 (Circuit Breaker)** 会在多次连续失败后自动暂时隔离该提供商。结果可按 TTL 缓存在内存中。
+
+## 免费额度优先
+
+先消耗免费通道，再使用密钥：Firecrawl keyless → Keenable keyless → SearXNG → DuckDuckGo，然后 Firecrawl key → Keenable key → Tavily → Brave → Exa。`provider` 和 `skipped` 会显示模式（`firecrawl:free`、`firecrawl:key#2`）。
+
+`freeTierFirst=false` 会按提供商交错免费与密钥尝试。要完全关闭 keyless，请设置 `firecrawlKeylessSearch=false`、`firecrawlKeylessFetch=false`、`keenableEnabled=false`。
+
+升级后 Keenable 会加入默认顺序；设置 `keenableEnabled=false` 可退出。多个密钥可用逗号分隔，认证/限流/额度失败时会轮换。
+
+当 `allowInternalUrls=true` 时，内网 URL 只由本地 `readability` 处理，云提供商会被跳过。
 
 提取 URL 会校验：仅 **http/https**，禁止 URL 内嵌凭据，主机名必须解析为 **公网** IP（回环 / RFC1918 / 链路本地 / 元数据地址默认拦截）。仅在确实需要时才打开 `allowInternalUrls`。
 
@@ -62,6 +72,8 @@ dsh plugin --profile web add @goodandready/dsh-web-gateway
 ## 凭证
 
 在 **设置 → 凭证**（或 `$DSH_HOME/.credentials.yaml`）中保存密钥。设置卡片只保存 **凭证名称**，不保存密钥本身。
+
+`FIRECRAWL_API_KEY` 和 `KEENABLE_API_KEY` 可选：keyless 模式无需密钥。凭证值可包含多个以逗号分隔的密钥。
 
 ## 与核心网页工具的关系
 

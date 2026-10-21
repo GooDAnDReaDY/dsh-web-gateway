@@ -43,11 +43,21 @@
 
 | Инструмент | Назначение |
 |---|---|
-| `web_gateway_search` | Поиск. Цепочка: **Tavily → Brave → Firecrawl → Exa → локальный SearXNG → DuckDuckGo** |
-| `web_gateway_extract` | Извлечение URL в Markdown. Цепочка: **Firecrawl → Tavily → Crawl4AI → Jina → readability** |
+| `web_gateway_search` | Поиск. Бесплатные: **Firecrawl keyless → Keenable keyless → SearXNG → DuckDuckGo**; затем ключи: **Firecrawl → Keenable → Tavily → Brave → Exa** |
+| `web_gateway_extract` | Извлечение URL в Markdown. Бесплатные: **Firecrawl keyless → Jina → readability**; затем ключи: **Firecrawl → Tavily → Crawl4AI** |
 | `web_gateway_research` | Поиск + извлечение топ-источников в единый краткий дайджест |
 
 Провайдер пропускается при отсутствии ключа, пустом ответе, HTTP 429/5xx или сетевой ошибке. Встроенный **Circuit Breaker** автоматически временно исключает сбоящие провайдеры на время cooldown. Результаты кэшируются в памяти (настраиваемый TTL).
+
+## Бесплатные квоты
+
+Сначала расходуются бесплатные каналы, затем ключи: Firecrawl keyless → Keenable keyless → SearXNG → DuckDuckGo, затем Firecrawl key → Keenable key → Tavily → Brave → Exa. Поле `provider` и `skipped` показывает режим (`firecrawl:free`, `firecrawl:key#2`).
+
+`freeTierFirst=false` перемежает бесплатные и ключевые попытки по провайдерам. Чтобы полностью отключить keyless, задайте `firecrawlKeylessSearch=false`, `firecrawlKeylessFetch=false` и `keenableEnabled=false`.
+
+Keenable появляется в порядке по умолчанию после обновления; отключить — `keenableEnabled=false`. Несколько ключей можно передать через запятую: при auth/rate/quota плагин переходит к следующему.
+
+Внутренние URL при `allowInternalUrls=true` обслуживает только локальный `readability`; облачные провайдеры для них пропускаются.
 
 URL для extract проверяются: только **http/https**, без credentials в ссылке, hostname должен резолвиться в **публичный** IP (loopback / RFC1918 / link-local / metadata по умолчанию запрещены). `allowInternalUrls` включайте только осознанно.
 
@@ -62,6 +72,8 @@ dsh plugin --profile web add @goodandready/dsh-web-gateway
 ## Учётные данные
 
 Ключи храните в **Настройки → Credentials** (или `$DSH_HOME/.credentials.yaml`). В карточке плагина — только **имена** credentials, не сами секреты.
+
+`FIRECRAWL_API_KEY` и `KEENABLE_API_KEY` необязательны: keyless-режим работает без них. Значение credential может содержать несколько ключей через запятую.
 
 ## Связь со штатным веб-поиском DSH
 

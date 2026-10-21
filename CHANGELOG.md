@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.2
+
+### Added
+- **Free-tier-first chain**: every enabled keyless attempt runs before any keyed attempt. `provider` and `skipped` now use `provider:mode` labels such as `firecrawl:free` and `firecrawl:key#2`.
+- **Keyless Firecrawl v2 search and extract**: no API key required; a key still works and adds its own quota. Search maps `news`, `code`, `academic`, and `freshness`; extract supports screenshots.
+- **Keenable search**: keyless `/v1/search/public` with `X-Keenable-Title`, plus keyed `/v1/search`.
+- **Multi-key rotation**: a comma-separated credential value is split into ordered keys; auth, rate-limit, and quota failures rotate to the next key.
+- **Per-mode accounting**: `dailyCapFirecrawlFree`, `dailyCapKeenableFree`, and `dailyCapKeenable`; free labels are estimated at $0 in telemetry.
+- **Run-wide deadlines**: `searchDeadlineMs` and `extractDeadlineMs` bound the longer attempt chain.
+- **Internal-target policy**: with `allowInternalUrls=true`, cloud providers are skipped for private targets; only local `readability` runs.
+
+### Changed
+- Default search order is now `firecrawl,keenable,searxng,duckduckgo,tavily,brave,exa`.
+- Firecrawl search and extract use the v2 endpoints.
+- Keyless Firecrawl search and extract are enabled by default, so public queries and URLs are sent to `api.firecrawl.dev` even without a key. Set `firecrawlKeylessSearch=false` / `firecrawlKeylessFetch=false` to keep those flows keyed or local.
+- Daily caps for Firecrawl now live under `firecrawl:free` / `firecrawl:key`; old `firecrawl` counters are no longer read.
+- Existing installs that never saved `searchProviderOrder` start using Keenable after upgrade; opt out with `keenableEnabled=false`.
+
+### Fixed
+- Free and keyed daily caps are separate, and all keys of a provider share one keyed cap instead of resolving to an unlimited counter.
+
 ## 0.2.1
 
 ### Fixed

@@ -39,17 +39,39 @@ Resilient **web search** and **page extract** tools for [DeepSeek Harness](https
 
 When the built-in `web_search` / `web_fetch` tools hit rate limits, captchas, or empty results, this plugin gives the model a separate fallback chain with different tool names (no registration collisions).
 
+Free tiers are tried before keys: Firecrawl keyless, Keenable keyless, local SearXNG, and DuckDuckGo run before any keyed provider. Every result names the exact mode (`firecrawl:free`, `firecrawl:key#2`).
+
 ## Tools
 
 | Tool | Purpose |
 |---|---|
-| `web_gateway_search` | Search the web. Chain: **Tavily → Brave → Firecrawl → Exa → SearXNG → DuckDuckGo** |
-| `web_gateway_extract` | Fetch a URL as markdown. Chain: **Firecrawl → Tavily → Crawl4AI → Jina → readability** |
+| `web_gateway_search` | Search the web. Free tier: **Firecrawl keyless → Keenable keyless → SearXNG → DuckDuckGo**; then keys: **Firecrawl → Keenable → Tavily → Brave → Exa** |
+| `web_gateway_extract` | Fetch a URL as markdown. Free tier: **Firecrawl keyless → Jina → readability**; then keys: **Firecrawl → Tavily → Crawl4AI** |
 | `web_gateway_research` | Search + extract top sources into a capped multi-source brief |
 
 A provider is skipped on missing key, empty result, HTTP 429/5xx, rate limits or network error. Built-in **Circuit Breaker** temporarily pauses providers suffering consecutive failures to avoid long timeouts. Results are cached in memory (configurable TTL). Successful responses include `provider`, `skipped` (providers not used and why), and `cached`.
 
-Extract URLs are validated: **http/https only**, no embedded credentials, and hostnames must resolve to **public** IPs (loopback / RFC1918 / link-local / metadata blocked). Set `allowInternalUrls` only if you intentionally need internal targets.
+## Free tier first
+
+The plugin expands each provider into free and keyed attempts. With `freeTierFirst` (default), every free attempt runs before every keyed attempt:
+
+1. Firecrawl keyless
+2. Keenable keyless
+3. SearXNG (if configured)
+4. DuckDuckGo
+5. Firecrawl key
+6. Keenable key
+7. Tavily
+8. Brave
+9. Exa
+
+`freeTierFirst=false` interleaves free and keyed attempts per provider. To disable keyless entirely, set `firecrawlKeylessSearch=false`, `firecrawlKeylessFetch=false`, and `keenableEnabled=false`.
+
+Keenable joins the default order on upgrade; set `keenableEnabled=false` to opt out.
+
+A provider with a comma-separated credential value uses its keys in order. Authentication, rate-limit, and quota failures rotate to the next key.
+
+Extract URLs are validated: **http/https only**, no embedded credentials, and hostnames must resolve to **public** IPs (loopback / RFC1918 / link-local / metadata blocked). Set `allowInternalUrls` only if you intentionally need internal targets; even then cloud providers are skipped and only local `readability` runs.
 
 ## Install
 
@@ -65,11 +87,14 @@ Add keys under **Settings → Credentials** (or `$DSH_HOME/.credentials.yaml`). 
 
 | Default name | Used by |
 |---|---|
-| `TAVILY_API_KEY` | search + extract |
-| `FIRECRAWL_API_KEY` | search + scrape |
+| `TAVILY_API_KEY` | search + extract (keyed tier) |
+| `FIRECRAWL_API_KEY` | optional: keyless search/scrape works without it; a key adds its own quota |
+| `KEENABLE_API_KEY` | optional: keyless search works without it; a key lifts the hourly cap |
 | `EXA_API_KEY` | search |
 | `BRAVE_API_KEY` | search |
 | `CRAWL4AI_TOKEN` | extract (only if `crawl4aiUrl` is set) |
+
+A credential value may contain multiple keys separated by commas; they are tried in order.
 
 ## Settings
 
@@ -79,17 +104,25 @@ Configure in **Settings → Plugins → Web Gateway**:
 |---|---|---|
 | `defaultLimit` | `5` | Default search result count |
 | `maxLimit` | `20` | Hard search cap |
-| `timeoutMs` | `30000` | Per-provider timeout |
+| `timeoutMs` | `30000` | Legacy per-provider hint; the active budgets are `searchDeadlineMs` / `extractDeadlineMs` |
 | `cacheTtlMs` | `600000` | In-memory cache TTL (`0` disables) |
 | `searxngUrl` | empty | Local SearXNG base URL; empty disables |
 | `crawl4aiUrl` | empty | Crawl4AI base URL; empty disables |
 | `includeDomains` / `excludeDomains` | empty | Search domain allow/deny lists |
 | `freshness` | `any` | `any` / `day` / `week` / `month` |
 | `diskCacheEnabled` | `true` | Persist cache under the DSH profile |
-| `dailyCap*` | `0` | Per-provider daily caps (`0` = unlimited, UTC day) |
-| `searchProviderOrder` | `tavily,firecrawl,exa,searxng` | Comma-separated search provider order |
-| `extractProviderOrder` | `firecrawl,tavily,crawl4ai` | Comma-separated extract provider order |
-| `allowInternalUrls` | `false` | Allow private/loopback extract targets |
+| `freeTierFirst` | `true` | All keyless attempts before any keyed attempt |
+| `firecrawlKeylessSearch` | `true` | Allow keyless Firecrawl search |
+| `firecrawlKeylessFetch` | `true` | Allow keyless Firecrawl extract; sends public URLs to Firecrawl cloud |
+| `keenableEnabled` | `true` | Enable Keenable search (keyless, plus keyed when a key exists) |
+| `keenableApiKeyEnv` | `KEENABLE_API_KEY` | Keenable credential name |
+| `searchDeadlineMs` | `60000` | Wall-clock budget for one search chain |
+| `extractDeadlineMs` | `60000` | Wall-clock budget for one extract chain |
+| `dailyCap*` | `0` | Per provider+mode daily caps (`0` = unlimited, UTC day) |
+| `dailyCapFirecrawlFree` / `dailyCapKeenableFree` / `dailyCapKeenable` | `0` | Free and keyed caps for the new modes |
+| `searchProviderOrder` | `firecrawl,keenable,searxng,duckduckgo,tavily,brave,exa` | Comma-separated search provider order |
+| `extractProviderOrder` | `firecrawl,tavily,crawl4ai,jina,readability` | Comma-separated extract provider order |
+| `allowInternalUrls` | `false` | Allow private/loopback extract targets (local provider only) |
 
 ## How it relates to core DSH web tools
 
